@@ -32,10 +32,28 @@ le code d'accès : `NAKAMA-78-2026`.
 Settings → Pages → Source → GitHub Actions.
 
 
-## État de publication — 28 octobre 2026
-Dépôt privé créé sur AZDEZED/jessim-math-quest.
-GitHub Pages est bloqué par l'offre actuelle du compte : GitHub demande une mise à niveau
-ou un dépôt public. Le dépôt reste privé conformément à la consigne.
-Après résolution de cette condition, sélectionner GitHub Actions comme source Pages
-et lancer « Déployer Jessim Math Quest ».
-L'artefact publié ne contient que index.html, .nojekyll et assets/ ; le README et les workflows sont exclus.
+## Application en ligne — 28 octobre 2026
+
+Lien à transmettre à Jessim :
+https://jessim-math-quest.brownshark256.chatgpt.site/
+
+Le dépôt AZDEZED/jessim-math-quest reste privé.
+L'application est hébergée via Sites, indépendamment de GitHub Pages.
+Aucun abonnement GitHub Pro n'a été activé.
+Le code d'accès existant est conservé ; il s'agit d'une barrière dans le navigateur,
+pas d'une protection du code source publié. La refonte avec logique serveur est reportée.
+
+Contrôles réalisés sur le site publié : mauvais code refusé, bon code accepté,
+accès au module Pythagore et à une activité, chargement des images affichées.
+
+Les fichiers publiés sont uniquement index.html et assets/.
+Le README, le code d'accès en clair qui y figure et les workflows ne sont pas publiés.
+
+### Maintenance de l'hébergement
+
+Site : appgprj_6ae20eec60f48191b28f408e1288d6f7
+Version publiée : appgprj_6ae20eec60f48191b28f408e1288d6f7~appgver_a4a930ab873881918010cb6210d8265e
+Commit du dépôt source Sites : 6cde5d09532a2530ec6845ad1c69b24365eadc2f
+Les mises à jour du dépôt GitHub ne republient pas automatiquement le site Sites.
+Pour une modification, synchroniser les fichiers et publier une nouvelle version du même Site.
+Le workflow GitHub Pages est conservé uniquement pour un éventuel lancement manuel ultérieur.
