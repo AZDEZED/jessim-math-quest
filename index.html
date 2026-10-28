@@ -208,7 +208,7 @@ background:#c94637;color:white;font-size:2rem;border:4px solid white;box-shadow:
 <script>
 
 const ACCESS_SALT="JMQ-V1|";
-const ACCESS_HASH="552df21d95099279824ffbef895371aef072c1ed8c6ec2e24ceccefee9514967";
+const ACCESS_HASH="532a0be85e40ba60ab5b309f03693503b7233251afcaf79457ad94fab23d1ea4";
 async function hashText(value){
   const data=new TextEncoder().encode(ACCESS_SALT+value);
   const buf=await crypto.subtle.digest("SHA-256",data);
