@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Jessim Math Quest V2.1</title>
+<title>Jessim Math Quest V3</title>
 <style>
 :root{
   --paper:#f6f0df;--panel:#fffdf8;--ink:#17202a;--muted:#667085;--line:#d9dee7;
@@ -109,6 +109,7 @@ background:#c94637;color:white;font-size:2rem;border:4px solid white;box-shadow:
   color:#667085;font-size:.72rem;text-align:center
 }
 </style>
+<link rel="stylesheet" href="app.css">
 </head>
 <body>
 
@@ -129,7 +130,7 @@ background:#c94637;color:white;font-size:2rem;border:4px solid white;box-shadow:
 
 <div class="shell">
 <header class="topbar">
-  <div class="brand"><div class="brand-mark">J</div><div><b>Jessim Math Quest</b><div class="muted small">V2.1 • parcours de maîtrise</div></div></div>
+  <div class="brand"><div class="brand-mark">J</div><div><b>Jessim Math Quest</b><div class="muted small">V3 • parcours de maîtrise</div></div></div>
   <div class="top-actions">
     <button class="btn ghost sm hide-mobile" onclick="openTracking()">Suivi parent</button>
     <button class="btn ghost sm" onclick="toggleSettings()">⚙️</button>
@@ -171,7 +172,7 @@ background:#c94637;color:white;font-size:2rem;border:4px solid white;box-shadow:
       <main>
         <span id="lessonPill" class="pill"></span>
         <h2 id="lessonTitle"></h2>
-        <div id="lessonObjective" class="muted"></div>
+        <div id="lessonObjective" class="muted"></div><div id="stageFollowup" class="actions"><button class="btn ghost sm" onclick="sendForm()">Envoyer ce point d’étape au suivi</button></div>
         <div id="stepper" class="stepper"></div>
         <div id="stage"></div>
       </main>
@@ -329,7 +330,7 @@ function backModule(){showModule(currentModule)}
 function renderCompetencies(){const m=MODULES[currentModule],s=getState();document.getElementById("modulePct").innerHTML=`<b>${moduleProgress(currentModule)}%</b> autonome`;
  document.getElementById("competencyList").innerHTML=m.comps.map(code=>{const d=C[code],st=s.progress[code];let label="Non commencé",cl="";if(st){if(st.status==="autonome"){label="🟢 autonome";cl="green"}else if(st.status==="indice1"){label="🟡 indice 1";cl="yellow"}else if(st.status==="indice2"){label="🟠 indice 2";cl="orange"}else{label="🔴 à revoir";cl="red"}}return `<div class="competency"><div><span class="code">${code}</span><b>${d.title}</b><div class="small muted">${d.obj}</div></div><div><span class="status ${cl}">${label}</span><div style="height:6px"></div><button class="btn sm" onclick="startLesson('${code}')">${st?'Reprendre':'Commencer'}</button></div></div>`}).join("")}
 function startLesson(code){currentCode=code;currentModule=Object.keys(MODULES).find(k=>MODULES[k].comps.includes(code));phase=0;attempts=0;run={maxAid:0,transferAid:0,theoryAid:0,procedureAid:0,recallAid:0,procedure1:false,procedure2:false,recall:false};renderLesson();show("lessonScreen")}
-function renderLesson(){attempts=0;const d=C[currentCode];document.getElementById("lessonPill").textContent=currentCode+" • "+d.guide;document.getElementById("lessonTitle").textContent=d.title;document.getElementById("lessonObjective").textContent=d.obj;
+function renderLesson(){if(!jmqRestoringLesson)attempts=0;const d=C[currentCode];document.getElementById("lessonPill").textContent=(d.displayCode||currentCode)+" • "+d.guide;document.getElementById("lessonTitle").textContent=d.title;document.getElementById("lessonObjective").textContent=d.obj;
  document.getElementById("guideName").textContent=d.guide;document.getElementById("guideImg").src=chars[d.guide]||chars.Chopper;
  document.getElementById("stepper").innerHTML=phases.map((x,i)=>`<span class="step ${i===phase?'on':i<phase?'done':''}">${i+1}. ${x}</span>`).join("");
  if(phase===0)theory();else if(phase===1)checkTheory();else if(phase===2)procedure(1);else if(phase===3)recall();else if(phase===4)exercise(false);else if(phase===5)procedure(2);else if(phase===6)exercise(true);else checkpoint();
@@ -361,12 +362,12 @@ function showAssistance(id,hint1,hint2,solution,aidField){
 }
 function validateTheory(){
  const d=C[currentCode],v=norm(document.getElementById("theoryAns").value),ok=v===norm(d.check[1]),f=document.getElementById("tfb");
- if(ok){f.className="feedback show good";f.textContent="Oui. Le cours est compris : on peut construire la procédure.";setTimeout(next,550);return}
+ if(ok){f.className="feedback show good";f.textContent="Oui. Le cours est compris : on peut construire la procédure.";jmqQueueNext(550);return}
  showAssistance("tfb","Relis ce rappel : "+escapeHTML(d.theory),"Point à vérifier : "+escapeHTML(d.obj)+" Relie ce point à la question posée.","Réponse attendue : <b>"+escapeHTML(d.check[1])+"</b>.<br>"+escapeHTML(d.theory)+"<p>Corrige ta réponse, puis valide à nouveau.</p>","theoryAid");
 }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1])}
 function procedure(which){
- const d=C[currentCode];order=shuffle([d.bad,...d.proc]);picks=[];
+ const d=C[currentCode];if(!jmqRestoringLesson){order=shuffle([d.bad,...d.proc]);picks=[];}
  document.getElementById("stage").innerHTML=`<h3>Reconstruction ${which===2?"avant le micro-transfert":"de la procédure"}</h3><p><b>Rituel :</b> sélectionne d’abord l’intrus, puis les vraies étapes dans l’ordre.</p><p class="small muted">Les numéros apparaissent dans l’ordre de tes clics. Reclique sur une carte pour la retirer.</p><div id="order" class="order"></div><div class="actions"><button class="btn" onclick="checkOrder(${which})">Valider l’ordre</button><button class="btn ghost" onclick="clearPicks()">Recommencer la sélection</button></div><div id="ofb" class="feedback" role="status" aria-live="polite"></div>`;
  document.getElementById("order").innerHTML=order.map((x,i)=>`<button type="button" class="order-card" data-i="${i}" aria-pressed="false" onclick="pick(this)"><span class="n"></span><span>${escapeHTML(x)}</span></button>`).join("");
  visual(d.visual);guide(which===2?"Même méthode, nouveaux nombres : reconstruis-la encore.":"La répétition rend la procédure automatique.","Usopp");
@@ -378,24 +379,24 @@ function pick(el){const i=Number(el.dataset.i);picks.includes(i)?picks=picks.fil
 function clearPicks(){picks=[];updateOrderNumbers()}
 function checkOrder(which){
  const d=C[currentCode],seq=picks.map(i=>order[i]),exp=[d.bad,...d.proc],ok=seq.length===exp.length&&seq.every((x,i)=>x===exp[i]),f=document.getElementById("ofb");
- if(ok){f.className="feedback show good";f.textContent="Intrus éliminé et procédure remise dans l’ordre.";if(which===1)run.procedure1=true;else run.procedure2=true;setTimeout(next,600);return}
+ if(ok){f.className="feedback show good";f.textContent="Intrus éliminé et procédure remise dans l’ordre.";if(which===1)run.procedure1=true;else run.procedure2=true;jmqQueueNext(600);return}
  showAssistance("ofb",`Commence par la phrase qui ne fait pas partie de la méthode. Sélectionne ensuite les ${d.proc.length} vraies étapes, du début à la fin.`,"L’intrus est : « "+escapeHTML(d.bad)+" ». La première vraie étape est : « "+escapeHTML(d.proc[0])+" ».","Voici l’ordre attendu de tes clics :<ol><li><b>Intrus :</b> "+escapeHTML(d.bad)+"</li>"+d.proc.map(x=>"<li>"+escapeHTML(x)+"</li>").join("")+"</ol><p>Recommence la sélection, puis reconstruis cet ordre toi-même.</p>","procedureAid");
 }
 function recall(){document.getElementById("stage").innerHTML=`<h3>Je réécris de mémoire</h3><p>Sans modèle, réécris les étapes essentielles dans l’ordre.</p><textarea id="recall" rows="9" placeholder="1. ...&#10;2. ..."></textarea><div class="actions"><button class="btn" onclick="checkRecall()">Vérifier</button></div><div id="rfb" class="feedback" role="status" aria-live="polite"></div>`;visual(C[currentCode].visual);guide("Ne cherche pas les mots exacts : retrouve le plan d’action.","Robin")}
 function checkRecall(){
  const d=C[currentCode],text=document.getElementById("recall").value.trim(),need=Math.min(60,d.proc.length*18),ok=text.length>=need,f=document.getElementById("rfb");
- if(ok){f.className="feedback show good";f.textContent="Le plan d’action est suffisamment reconstruit. Maintenant, applique-le.";run.recall=true;setTimeout(next,600);return}
+ if(ok){f.className="feedback show good";f.textContent="Le plan d’action est suffisamment reconstruit. Maintenant, applique-le.";run.recall=true;jmqQueueNext(600);return}
  showAssistance("rfb",`Retrouve les ${d.proc.length} étapes de la méthode. Commence par ce que tu observes avant de calculer.`,"La méthode commence par : « "+escapeHTML(d.proc[0])+" ». Elle se termine par : « "+escapeHTML(d.proc[d.proc.length-1])+" ».","Voici la méthode à reconstruire avec tes mots :<ol>"+d.proc.map(x=>"<li>"+escapeHTML(x)+"</li>").join("")+"</ol><p>Complète ta réponse, puis vérifie à nouveau.</p>","recallAid");
 }
-function exercise(transfer){const d=C[currentCode],q=transfer?d.q[5]:d.q;attempts=0;document.getElementById("stage").innerHTML=`<h3>${transfer?"Micro-transfert":"J’applique"}</h3><p><b>${transfer?q[0]:q[0]}</b></p><input id="ans" class="answer" placeholder="Ta réponse"><div class="actions"><button class="btn" onclick="checkAnswer(${transfer})">Valider</button><button class="btn ghost" onclick="phase=0;renderLesson()">Revoir la théorie</button></div><div id="afb" class="feedback" role="status" aria-live="polite"></div>`;visual(d.visual);guide(transfer?"La question change, mais la méthode reste la même.":"Suis les étapes dans l’ordre. Si tu bloques, l’aide arrivera progressivement.",transfer?"Chopper":d.guide)}
-function checkAnswer(transfer){const d=C[currentCode],q=transfer?d.q[5]:d.q;let expected=transfer?q[1]:d.q[1],v=norm(document.getElementById("ans").value),ok=v===norm(expected),f=document.getElementById("afb");if(ok){f.className="feedback show good";f.textContent=transfer?"Micro-transfert réussi. Tu as réutilisé la méthode sur un nouvel exemple.":"Bonne réponse.";if(transfer)run.transferAid=Math.max(run.transferAid,attempts);else run.maxAid=Math.max(run.maxAid,attempts);setTimeout(next,650);return}attempts=Math.min(attempts+1,3);if(transfer)run.transferAid=Math.max(run.transferAid,attempts);else run.maxAid=Math.max(run.maxAid,attempts);
+function exercise(transfer){const d=C[currentCode],q=transfer?d.q[5]:d.q;if(!jmqRestoringLesson)attempts=0;document.getElementById("stage").innerHTML=`<h3>${transfer?"Micro-transfert":"J’applique"}</h3><p><b>${transfer?q[0]:q[0]}</b></p><input id="ans" class="answer" placeholder="Ta réponse"><div class="actions"><button class="btn" onclick="checkAnswer(${transfer})">Valider</button><button class="btn ghost" onclick="phase=0;renderLesson()">Revoir la théorie</button></div><div id="afb" class="feedback" role="status" aria-live="polite"></div>`;visual(d.visual);guide(transfer?"La question change, mais la méthode reste la même.":"Suis les étapes dans l’ordre. Si tu bloques, l’aide arrivera progressivement.",transfer?"Chopper":d.guide)}
+function checkAnswer(transfer){const d=C[currentCode],q=transfer?d.q[5]:d.q;let expected=transfer?q[1]:d.q[1],v=norm(document.getElementById("ans").value),ok=v===norm(expected),f=document.getElementById("afb");if(ok){f.className="feedback show good";f.textContent=transfer?"Micro-transfert réussi. Tu as réutilisé la méthode sur un nouvel exemple.":"Bonne réponse.";if(transfer)run.transferAid=Math.max(run.transferAid,attempts);else run.maxAid=Math.max(run.maxAid,attempts);jmqQueueNext(650);return}attempts=Math.min(attempts+1,3);if(transfer)run.transferAid=Math.max(run.transferAid,attempts);else run.maxAid=Math.max(run.maxAid,attempts);
  const h1=transfer?"Reprends l’étape 1 de ta procédure.":d.q[2],h2=transfer?"Repère précisément ce qui change dans ce nouvel exercice.":d.q[3],exp=transfer?`La bonne réponse était ${expected}. Reviens à la théorie, puis refais cette compétence plus tard.`:d.q[4];
  if(attempts===1){f.className="feedback show warn";f.innerHTML="<b>Indice 1</b> — "+h1;guide("Je te donne juste un petit déclencheur. À toi de reprendre.","Chopper")}
  else if(attempts===2){f.className="feedback show warn";f.innerHTML="<b>Indice 2</b> — "+h2;guide("Deuxième aide : je rappelle une partie de la méthode, pas toute la solution.","Chopper")}
  else {f.className="feedback show bad";f.innerHTML="<b>Troisième erreur — solution expliquée</b><br>"+"<p>Réponse attendue : <b>"+escapeHTML(expected)+"</b></p>"+exp+(transfer?'<div class="actions"><button class="btn ghost" onclick="phase=0;renderLesson()">Revoir la théorie</button><button class="btn blue" onclick="checkpoint()">Terminer cette tentative</button></div>':'<div class="actions"><button class="btn ghost" onclick="phase=0;renderLesson()">Revoir la théorie</button><button class="btn blue" onclick="phase=5;renderLesson()">Reconstruire avant le transfert</button></div>');guide("L’objectif n’est pas de copier la réponse : comprends pourquoi elle fonctionne.","Chopper")}
 }
 function statusFromRun(){const a=Math.max(run.maxAid||0,run.transferAid||0,run.theoryAid||0,run.procedureAid||0,run.recallAid||0);if((run.transferAid||0)>=3)return["transfert_echoue","🔴🔴 transfert échoué"];if(a===0)return["autonome","🟢 autonome"];if(a===1)return["indice1","🟡 indice 1"];if(a===2)return["indice2","🟠 indice 2"];return["solution","🔴 solution"]}
-function checkpoint(){phase=7;const d=C[currentCode],[status,label]=statusFromRun(),s=getState(),detail={procedure1:run.procedure1,recall:run.recall,maxAid:run.maxAid,procedure2:run.procedure2,transferAid:run.transferAid,theoryAid:run.theoryAid||0,procedureAid:run.procedureAid||0,recallAid:run.recallAid||0};s.progress[currentCode]={status,date:new Date().toISOString(),detail};s.last={module:currentModule,code:currentCode};s.logs.push({date:new Date().toISOString(),student:"Jessim",module:MODULES[currentModule].label,code:currentCode,skill:d.title,status,label,detail});putState(s);
+function checkpoint(){phase=7;const d=C[currentCode],[status,label]=statusFromRun(),s=getState(),detail={procedure1:run.procedure1,recall:run.recall,maxAid:run.maxAid,procedure2:run.procedure2,transferAid:run.transferAid,theoryAid:run.theoryAid||0,procedureAid:run.procedureAid||0,recallAid:run.recallAid||0};jmqRecordCheckpoint(status,label,detail);
  document.getElementById("stepper").innerHTML=phases.map((x,i)=>`<span class="step ${i===7?'on':i<7?'done':''}">${i+1}. ${x}</span>`).join("");
  document.getElementById("stage").innerHTML=`<h3>Checkpoint</h3><p><b>${label}</b></p><div class="kpis"><div class="kpi"><b>Procédure</b><br><span class="small">${run.procedure1&&run.procedure2?"réactivée 2 fois":"à renforcer"}</span></div><div class="kpi"><b>Rappel libre</b><br><span class="small">${run.recall?"fait":"incomplet"}</span></div><div class="kpi"><b>Aide méthode</b><br><span class="small">${Math.max(run.theoryAid||0,run.procedureAid||0,run.recallAid||0)}</span></div><div class="kpi"><b>Aide exercice</b><br><span class="small">${run.maxAid||0}</span></div><div class="kpi"><b>Aide transfert</b><br><span class="small">${run.transferAid||0}</span></div></div><div class="actions"><button class="btn green" onclick="sendForm()">Valider dans Google Forms</button><button class="btn" onclick="backModule()">Continuer le parcours</button></div><div id="formMsg" class="feedback"></div>`;
  visual(d.visual);guide(status==="autonome"?"Mission maîtrisée sans aide.":"Cette trace indique précisément le niveau d’aide encore nécessaire.","Luffy")}
@@ -408,8 +409,7 @@ function openTracking(){window.open(TRACKING_SHEET,"_blank")}
 function toggleSettings(){show("settingsScreen");const c=formConfig();["formBase","entryStudent","entryModule","entryCode","entryStatus","entryDetail"].forEach(id=>document.getElementById(id).value=c[id.replace("formBase","base").replace("entryStudent","student").replace("entryModule","module").replace("entryCode","code").replace("entryStatus","status").replace("entryDetail","detail")]||"")}
 function saveFormConfig(){const c={base:formBase.value.trim(),student:entryStudent.value.trim(),module:entryModule.value.trim(),code:entryCode.value.trim(),status:entryStatus.value.trim(),detail:entryDetail.value.trim()};localStorage.setItem("jmq_form",JSON.stringify(c));alert("Configuration Google Forms enregistrée sur cet appareil.");goHome()}
 function exportProgress(){const blob=new Blob([JSON.stringify(getState(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="jessim-math-quest-progression.json";a.click();URL.revokeObjectURL(a.href)}
-renderHome();
-initAccess();
+
 </script>
 
 <footer class="creator-footer">
@@ -417,5 +417,9 @@ initAccess();
 <span class="creator-contact"><a href="mailto:zeboudjakim@gmail.com" style="color:inherit;text-decoration:none">zeboudjakim@gmail.com</a></span>
 </footer>
 
+<script src="app-progress.js"></script>
+<script src="app-practice.js"></script>
+<script src="app-forms.js"></script>
+<script>jmqBootstrap();</script>
 </body>
 </html>

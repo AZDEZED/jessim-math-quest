@@ -32,7 +32,7 @@ jobs:
           test -f index.html
           test -d assets
           mkdir -p _site
-          cp index.html .nojekyll _site/
+          cp index.html .nojekyll app-progress.js app-practice.js app-forms.js app.css _site/
           cp -R assets _site/assets
 
       - name: Charger l'artefact Pages
