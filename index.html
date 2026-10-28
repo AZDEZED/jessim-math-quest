@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jessim Math Quest V1</title>
+<style>
+:root{
+  --paper:#f6f0df;--panel:#fffdf8;--ink:#17202a;--muted:#667085;--line:#d9dee7;
+  --red:#c94637;--blue:#277a9b;--gold:#d5a62a;--green:#2f8f63;--orange:#d9822b;
+  --navy:#172a3a;--shadow:0 14px 36px rgba(24,32,42,.11);--r:20px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
+ background:
+ radial-gradient(circle at 8% 4%,rgba(255,255,255,.9),transparent 18rem),
+ linear-gradient(180deg,#dff2f9 0,#f6f0df 28rem,#f6f0df 100%);}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.shell{max-width:1180px;margin:auto;padding:14px 16px 48px}
+.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:8px 0 16px;position:sticky;top:0;z-index:20;
+ background:linear-gradient(180deg,rgba(223,242,249,.96),rgba(223,242,249,.86),rgba(223,242,249,0));backdrop-filter:blur(6px)}
+.brand{display:flex;align-items:center;gap:11px}.brand-mark{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+ background:var(--red);color:white;font-weight:1000;font-size:1.1rem;border:3px solid #fff;box-shadow:var(--shadow)}
+.brand b{font-size:1.05rem}.muted{color:var(--muted)}.small{font-size:.82rem}
+.top-actions{display:flex;gap:7px;align-items:center}
+.btn{border:0;border-radius:13px;padding:11px 15px;font-weight:850;background:var(--red);color:white;box-shadow:0 5px 13px rgba(201,70,55,.15)}
+.btn:hover{filter:brightness(.98);transform:translateY(-1px)}.btn.blue{background:var(--blue)}.btn.gold{background:#aa7d0e}.btn.green{background:var(--green)}
+.btn.ghost{background:#edf1f4;color:var(--ink);box-shadow:none}.btn.sm{padding:8px 11px;font-size:.86rem}
+.screen{display:none}.screen.active{display:block}
+.card{background:rgba(255,253,248,.97);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.hero{display:grid;grid-template-columns:1.18fr .82fr;gap:16px}
+.hero h1{font-size:clamp(2.2rem,5.4vw,4.5rem);line-height:.92;margin:.25em 0 .35em;letter-spacing:-.04em}
+.hero-art{position:relative;overflow:hidden;min-height:330px;border-radius:var(--r);
+ background:radial-gradient(circle at 72% 25%,#fff 0 12%,transparent 13%),linear-gradient(145deg,#76c4df 0,#e9cf75 70%,#d8a44a 100%)}
+.hero-art:before{content:"GRAND LINE";position:absolute;left:18px;top:20px;font-weight:1000;font-size:2.3rem;opacity:.12;letter-spacing:.05em}
+.hero-char{width:100%;height:100%;object-fit:contain;object-position:center bottom;position:absolute;bottom:0;left:0;filter:drop-shadow(0 15px 12px rgba(0,0,0,.19))}
+.hero-fallback{height:100%;display:grid;place-items:center;text-align:center;padding:28px;font-weight:900}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;background:#edf6f9;color:#2b6c84;font-size:.82rem;font-weight:850}
+.modules{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-top:14px}
+.module-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:13px;min-height:152px;position:relative;overflow:hidden;cursor:pointer}
+.module-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.module-card img{position:absolute;right:-8px;bottom:-5px;width:92px;height:105px;object-fit:contain;opacity:.85}
+.module-card b{display:block;max-width:75%;font-size:1rem}.module-card .pct{font-size:1.45rem;font-weight:950;margin-top:16px}
+.bar{height:8px;background:#e8ebef;border-radius:99px;overflow:hidden;margin-top:6px}.bar>div{height:100%;background:linear-gradient(90deg,var(--blue),var(--gold))}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.section-title{display:flex;justify-content:space-between;gap:10px;align-items:end;margin:20px 0 9px}
+.section-title h2{margin:0}.back{border:0;background:none;color:var(--blue);font-weight:900;padding:0;margin:0 0 10px}
+.competency{border:1px solid var(--line);background:#fff;border-radius:14px;padding:13px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.competency .code{font-weight:950;color:var(--blue);min-width:45px}.status{font-size:.76rem;border-radius:999px;padding:5px 8px;background:#edf0f4;white-space:nowrap}
+.status.green{background:#e6f6ed;color:#1d704b}.status.yellow{background:#fff4d9;color:#7c5700}.status.orange{background:#fff0df;color:#8f5414}.status.red{background:#fee9e5;color:#9b3026}
+.lesson-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+.visual-card{min-height:360px;border-radius:18px;background:#f6f8fb;border:2px dashed #cbd5df;padding:18px;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden}
+.guide-card{margin-top:11px;border-left:5px solid var(--gold);background:#fff8dc;border-radius:11px;padding:11px;display:grid;grid-template-columns:62px 1fr;gap:10px;align-items:center}
+.guide-card img{width:62px;height:72px;object-fit:contain;filter:drop-shadow(0 3px 4px rgba(0,0,0,.16))}
+.stepper{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 18px}.step{font-size:.74rem;background:#edf0f4;color:#6b7280;border-radius:999px;padding:6px 9px}
+.step.on{background:#fdebb8;color:#755500;font-weight:950}.step.done{background:#e7f6ed;color:#276b4e}
+.math{font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.7rem,4vw,2.45rem);line-height:1.55}.math.sm{font-size:1.5rem}
+.circle{border:3px solid var(--red);border-radius:50%;padding:0 .13em}.underline{border-bottom:5px solid var(--blue);padding:0 .08em}.boxit{border:3px solid var(--gold);border-radius:8px;padding:.03em .15em}
+.note{background:#fff8dc;border-left:5px solid var(--gold);border-radius:10px;padding:12px 14px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}.answer,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:white}
+.feedback{display:none;margin-top:12px;border-radius:12px;padding:12px}.feedback.show{display:block}.good{background:#e8f7ef;color:#246a4d}.warn{background:#fff4de;color:#885909}.bad{background:#fff0ed;color:#96392f}
+.order{display:grid;gap:8px}.order-card{border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff;cursor:pointer;display:flex;gap:9px}
+.order-card.sel{outline:3px solid #9fd6e9}.order-card .n{width:25px;height:25px;border-radius:50%;background:#edf0f4;display:grid;place-items:center;font-size:.75rem;font-weight:900}
+.checks{display:grid;gap:9px}.checkline{display:flex;gap:8px;align-items:flex-start}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.kpi{border:1px solid var(--line);border-radius:13px;padding:10px;background:white}
+.parent{margin-top:16px;border-top:1px dashed var(--line);padding-top:12px}.settings{display:none;margin-top:10px}.settings.open{display:block}
+.char-credit{font-size:.72rem;color:var(--muted);margin-top:16px}
+svg text{font-family:system-ui,sans-serif;fill:var(--ink)}
+@media(max-width:920px){.hero,.lesson-layout{grid-template-columns:1fr}.modules{grid-template-columns:1fr 1fr}.hero-art{min-height:280px}}
+@media(max-width:620px){.modules,.grid2,.grid3,.kpis{grid-template-columns:1fr}.top-actions .hide-mobile{display:none}.shell{padding:10px}.card{padding:15px}}
+
+.access-gate{position:fixed;inset:0;z-index:9999;background:
+linear-gradient(160deg,#102b3c 0%,#1f6d8d 48%,#d6ad43 100%);
+display:grid;place-items:center;padding:18px}
+.access-gate.hidden{display:none}
+.access-panel{width:min(480px,100%);background:rgba(255,253,248,.98);border:1px solid rgba(255,255,255,.75);
+border-radius:24px;padding:26px;box-shadow:0 22px 70px rgba(0,0,0,.28);text-align:center}
+.access-emblem{width:78px;height:78px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;
+background:#c94637;color:white;font-size:2rem;border:4px solid white;box-shadow:0 7px 22px rgba(0,0,0,.18)}
+.access-panel h1{margin:.2em 0;font-size:2rem}.access-panel p{color:#667085}
+.access-error{display:none;margin-top:10px;padding:10px;border-radius:10px;background:#fff0ed;color:#96392f}
+.access-error.show{display:block}
+
+
+.creator-footer{
+  max-width:1180px;
+  margin:18px auto 0;
+  padding:8px 16px 4px;
+  text-align:center;
+  font-size:.68rem;
+  letter-spacing:.02em;
+  color:rgba(23,32,42,.42);
+  user-select:none;
+}
+
+
+.creator-contact{
+  display:block;
+  margin-top:3px;
+  font-size:.64rem;
+  color:rgba(23,32,42,.34);
+}
+
+.asset-warning{
+  position:absolute;inset:auto 14px 14px 14px;
+  padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.86);
+  color:#667085;font-size:.72rem;text-align:center
+}
+</style>
+</head>
+<body>
+
+<div id="accessGate" class="access-gate">
+  <div class="access-panel">
+    <div class="access-emblem">🏴‍☠️</div>
+    <span class="pill">Accès privé</span>
+    <h1>Jessim Math Quest</h1>
+    <p>Entre le code transmis par Akim pour rejoindre le parcours.</p>
+    <input id="accessCode" class="answer" type="password" autocomplete="off" placeholder="Code d’accès">
+    <div class="actions" style="justify-content:center">
+      <button class="btn" onclick="unlockApp()">Entrer dans l’aventure</button>
+    </div>
+    <div id="accessError" class="access-error">Code incorrect. Vérifie les caractères puis réessaie.</div>
+    <div class="small muted" style="margin-top:14px">La session restera ouverte sur cet appareil jusqu’à la fermeture de l’onglet.</div>
+  </div>
+</div>
+
+<div class="shell">
+<header class="topbar">
+  <div class="brand"><div class="brand-mark">J</div><div><b>Jessim Math Quest</b><div class="muted small">V1 • parcours de maîtrise</div></div></div>
+  <div class="top-actions">
+    <button class="btn ghost sm hide-mobile" onclick="openTracking()">Suivi parent</button>
+    <button class="btn ghost sm" onclick="toggleSettings()">⚙️</button>
+  </div>
+</header>
+
+<section id="home" class="screen active">
+  <div class="hero">
+    <div class="card">
+      <span class="pill">🏴‍☠️ Mission du jour</span>
+      <h1>Une méthode.<br>Des réflexes.<br>De l’autonomie.</h1>
+      <p>Chaque mission suit le même rituel : <b>comprendre → vérifier → reconstruire la méthode → la rappeler → appliquer → reconstruire encore → transférer → valider.</b></p>
+      <div class="actions">
+        <button class="btn" onclick="continueMission()">Continuer ma mission</button>
+        <button class="btn blue" onclick="showModule('pythagore')">Préparer le DM</button>
+      </div>
+      <div id="homeSummary" style="margin-top:14px"></div>
+    </div>
+    <div class="hero-art">
+      <img class="hero-char" src="assets/luffy.png"
+           alt="Luffy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+      <div class="hero-fallback" style="display:none">Luffy<br><span class="muted small">Visuel en cours d’installation</span></div>
+    </div>
+  </div>
+  <div id="moduleCards" class="modules"></div>
+  <div class="char-credit">Visuels de personnages embarqués dans le projet ; application destinée à un usage privé.</div>
+</section>
+
+<section id="moduleScreen" class="screen">
+  <button class="back" onclick="goHome()">← Retour à la carte</button>
+  <div class="section-title"><div><span id="modulePill" class="pill"></span><h2 id="moduleTitle"></h2><div id="moduleIntro" class="muted"></div></div><div id="modulePct"></div></div>
+  <div id="competencyList" class="grid2"></div>
+</section>
+
+<section id="lessonScreen" class="screen">
+  <button class="back" onclick="backModule()">← Retour aux compétences</button>
+  <div class="card">
+    <div class="lesson-layout">
+      <main>
+        <span id="lessonPill" class="pill"></span>
+        <h2 id="lessonTitle"></h2>
+        <div id="lessonObjective" class="muted"></div>
+        <div id="stepper" class="stepper"></div>
+        <div id="stage"></div>
+      </main>
+      <aside>
+        <div id="visual" class="visual-card"></div>
+        <div class="guide-card">
+          <img id="guideImg" alt="" onerror="this.style.visibility='hidden'">
+          <div><b id="guideName"></b><div id="guideText" class="small"></div></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section id="settingsScreen" class="screen">
+  <button class="back" onclick="goHome()">← Retour</button>
+  <div class="card">
+    <h2>Configuration parent</h2>
+    <p class="muted">La V1 sait construire une URL Google Forms préremplie. Il suffit de renseigner une fois l’URL du formulaire et les identifiants <code>entry.xxxxx</code> des champs.</p>
+    <div class="grid2">
+      <label>URL Google Form<input id="formBase" class="answer" placeholder="https://docs.google.com/forms/d/e/.../viewform"></label>
+      <label>Champ Élève<input id="entryStudent" class="answer" placeholder="entry.123456"></label>
+      <label>Champ Module<input id="entryModule" class="answer" placeholder="entry.123456"></label>
+      <label>Champ Code compétence<input id="entryCode" class="answer" placeholder="entry.123456"></label>
+      <label>Champ Statut<input id="entryStatus" class="answer" placeholder="entry.123456"></label>
+      <label>Champ Détail<input id="entryDetail" class="answer" placeholder="entry.123456"></label>
+    </div>
+    <div class="actions"><button class="btn green" onclick="saveFormConfig()">Enregistrer</button><button class="btn ghost" onclick="exportProgress()">Exporter la progression JSON</button></div>
+    <div class="parent"><b>Google Sheet de suivi déjà créé</b><p class="small muted">Le bouton « Suivi parent » ouvre le tableau de pilotage dans Google Sheets.</p></div>
+  </div>
+</section>
+</div>
+
+<script>
+
+const ACCESS_SALT="JMQ-V1|";
+const ACCESS_HASH="552df21d95099279824ffbef895371aef072c1ed8c6ec2e24ceccefee9514967";
+async function hashText(value){
+  const data=new TextEncoder().encode(ACCESS_SALT+value);
+  const buf=await crypto.subtle.digest("SHA-256",data);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+async function unlockApp(){
+  const input=document.getElementById("accessCode");
+  const err=document.getElementById("accessError");
+  const candidate=await hashText((input.value||"").trim());
+  if(candidate===ACCESS_HASH){
+    sessionStorage.setItem("jmq_access","ok");
+    document.getElementById("accessGate").classList.add("hidden");
+    err.classList.remove("show");
+  } else {
+    err.classList.add("show");
+    input.select();
+  }
+}
+function initAccess(){
+  if(sessionStorage.getItem("jmq_access")==="ok") document.getElementById("accessGate").classList.add("hidden");
+  const input=document.getElementById("accessCode");
+  input.addEventListener("keydown",e=>{if(e.key==="Enter") unlockApp();});
+}
+
+const TRACKING_SHEET="https://docs.google.com/spreadsheets/d/1u6WT7Zfuf3ExiisaSuL4sth1M8Atlk19zUME3UWYhdc/edit";
+const chars={
+ Luffy:"assets/luffy.png",
+ Zoro:"assets/zoro.png",
+ Nami:"assets/nami.png",
+ Robin:"assets/robin.png",
+ Chopper:"assets/chopper.png",
+ Sanji:"assets/sanji.png",
+ Franky:"assets/franky.png",
+ Usopp:"assets/usopp.png"
+};
+const MODULES={
+ tables:{label:"Tables 1 à 10",icon:"⚔️",guide:"Zoro",intro:"Justesse d’abord. Les tables de 7 et 8 sont prioritaires.",
+  comps:["T1","T2","T3","T4","T5","T6","T7"]},
+ fractions:{label:"Fractions",icon:"🍽️",guide:"Sanji",intro:"Comprendre le sens, puis automatiser les procédures.",
+  comps:["F0","F1","F2","F3","F4","F5","F6","F7","F8","F9","F10"]},
+ carres:{label:"Carrés & racines",icon:"🔧",guide:"Franky",intro:"Carrés, racines et encadrements utiles pour Pythagore.",
+  comps:["C0","C1","C2","C3","C4"]},
+ geo:{label:"Fondations géométriques",icon:"🧭",guide:"Nami",intro:"Lire les codages, choisir une propriété, démontrer.",
+  comps:["G1","G2","G3","G4","G5","G6"]},
+ pythagore:{label:"Pythagore",icon:"📚",guide:"Robin",intro:"Identifier, raisonner, calculer et rédiger sans sauter d’étape.",
+  comps:["P0","P1","P2","P3","P4","P5","P6","P7","P8","P9","P10"]}
+};
+const P={
+ fraction:["Je regarde les dénominateurs.","Je vérifie s’ils sont identiques.","Sinon, je cherche un dénominateur commun.","Je transforme : même opération en haut et en bas.","Je calcule les numérateurs.","Je garde le dénominateur commun.","Je simplifie si possible."],
+ pyth:["Je vérifie que le triangle est rectangle.","Je repère l’hypoténuse.","J’écris l’égalité avec les lettres.","Je remplace par les nombres.","J’isole le carré de la longueur cherchée.","Je calcule.","Je prends la racine carrée.","J’écris la valeur exacte ou l’approximation demandée.","Je vérifie la cohérence du résultat.","Je réponds avec l’unité."],
+ demo:["JE SAIS : je relève les informations de la figure ou de l’énoncé.","OR : je choisis la propriété qui s’applique.","DONC : j’écris la conclusion."],
+ square:["Je repère si on demande un carré ou une racine.","Pour a², je calcule a × a.","Pour √n, je cherche quel nombre au carré donne n.","Je vérifie avec l’opération inverse."],
+ table:["Je lis le calcul.","Je cherche le résultat sans réciter toute la table.","Si besoin, j’utilise un produit voisin connu.","Je donne la réponse.","Je vérifie rapidement."]
+};
+function c(title,obj,theory,check,proc,bad,q,visual,guide){return{title,obj,theory,check,proc,bad,q,visual,guide}}
+const C={
+T1:c("Comprendre la multiplication","Comprendre ce que signifie a × b.","7 × 4 peut se lire 7 groupes de 4 ou 4 groupes de 7. La multiplication est commutative : 7 × 4 = 4 × 7.",["7 × 4 et 4 × 7 donnent-ils le même résultat ?","oui"],P.table,"Je récite toutes les tables depuis 1.",["6 × 4 = ?","24","Pense à 6 groupes de 4.","4 + 4 + 4 + 4 + 4 + 4 = 24.","6 × 4 = 24.",["3 × 8 = ?","24"]],"table","Zoro"),
+T2:c("Tables faciles","Automatiser 1, 2, 5 et 10.","Ces tables servent d’appuis. Elles doivent être rapides et sûres.",["5 × 8 = ?","40"],P.table,"Je compte toujours un par un.",["10 × 7 = ?","70","Multiplier par 10 ajoute un zéro.","7 dizaines = 70.","10 × 7 = 70.",["2 × 9 = ?","18"]],"table","Zoro"),
+T3:c("Tables intermédiaires","Entretenir 3, 4, 6 et 9.","On utilise les résultats déjà connus pour éviter la récitation complète.",["4 × 6 = ?","24"],P.table,"Je repars de 1 × 6.",["9 × 6 = ?","54","10 × 6 = 60, puis retire 6.","60 − 6 = 54.","9 × 6 = 54.",["4 × 9 = ?","36"]],"table","Zoro"),
+T4:c("Table de 7","Sécuriser la table de 7.","La table de 7 est prioritaire. On travaille par petits groupes de produits.",["7 × 5 = ?","35"],P.table,"Je récite toute la table avant chaque réponse.",["7 × 8 = ?","56","7 × 4 = 28 : double 28.","28 + 28 = 56.","7 × 8 = 56.",["7 × 6 = ?","42"]],"table","Zoro"),
+T5:c("Table de 8","Sécuriser la table de 8.","La table de 8 est prioritaire. On peut doubler plusieurs fois.",["8 × 5 = ?","40"],P.table,"Je recommence depuis 8 × 1.",["8 × 7 = ?","56","8 × 5 = 40 et 8 × 2 = 16.","40 + 16 = 56.","8 × 7 = 56.",["8 × 9 = ?","72"]],"table","Zoro"),
+T6:c("Mélange 1 à 10","Répondre sans ordre prévisible.","En contrôle, les produits ne sont pas rangés par table. On doit les récupérer directement.",["6 × 8 = ?","48"],P.table,"Je cherche quelle table vient avant dans ma tête.",["7 × 9 = ?","63","Pense à 7 × 10 puis retire 7.","70 − 7 = 63.","7 × 9 = 63.",["8 × 6 = ?","48"]],"table","Zoro"),
+T7:c("Calcul inverse","Retrouver un facteur manquant.","Savoir que 7 × 8 = 56 aide aussi à résoudre 7 × ? = 56.",["7 × ? = 56","8"],P.table,"Je divise au hasard.",["8 × ? = 64","8","Quel produit de la table de 8 donne 64 ?","8 × 8 = 64.","Le facteur manquant est 8.",["7 × ? = 42","6"]],"table","Zoro"),
+
+F0:c("Comprendre une fraction","Identifier numérateur et dénominateur.","Dans 3/4, le dénominateur 4 indique en combien de parts égales l’unité est partagée ; le numérateur 3 indique combien de parts on prend.",["Dans 3/4, quel nombre indique le nombre total de parts égales ?","4"],["Je repère le dénominateur.","Je repère le numérateur.","Je traduis la fraction comme des parts égales."],"Je multiplie toujours les deux nombres.",["Dans 5/8, quel est le dénominateur ?","8","Regarde le nombre du bas.","Le dénominateur est sous la barre.","Dans 5/8, 8 est le dénominateur.",["Dans 7/10, quel est le numérateur ?","7"]],"fraction","Sanji"),
+F1:c("Fractions équivalentes","Transformer sans changer la quantité.","Pour obtenir une fraction équivalente, je fais exactement la même multiplication ou division en haut et en bas.",["1/2 = ?/6","3"],["Je regarde le dénominateur de départ et celui d’arrivée.","Je trouve l’opération qui relie les deux.","Je fais la même opération au numérateur.","Je vérifie que la valeur n’a pas changé."],"Je change seulement le dénominateur.",["3/4 = ?/12","9","De 4 à 12 : ×3.","Fais aussi ×3 au numérateur : 3 × 3.","3/4 = 9/12.",["2/5 = ?/15","6"]],"fraction","Sanji"),
+F2:c("Simplifier une fraction","Écrire une fraction équivalente plus simple.","Simplifier, c’est diviser le numérateur et le dénominateur par un même nombre.",["12/18 peut-on diviser haut et bas par 6 ?","oui"],["Je cherche un diviseur commun.","Je divise en haut et en bas par le même nombre.","Je recommence si c’est encore possible."],"Je soustrais le même nombre en haut et en bas.",["18/24 = ?","3/4","18 et 24 sont divisibles par 6.","18 ÷ 6 = 3 et 24 ÷ 6 = 4.","18/24 = 3/4.",["10/15 = ?","2/3"]],"fraction","Sanji"),
+F3:c("Même dénominateur","Additionner ou soustraire des parts de même taille.","Quand les dénominateurs sont identiques, les morceaux ont la même taille : on agit sur les numérateurs et on garde le dénominateur.",["3/8 + 2/8 = ?","5/8"],["Je vérifie que les dénominateurs sont identiques.","Je calcule les numérateurs.","Je garde le dénominateur.","Je simplifie si possible."],"J’additionne les dénominateurs.",["9/13 − 4/13 = ?","5/13","Les dénominateurs sont déjà identiques.","9 − 4 = 5 et le dénominateur reste 13.","9/13 − 4/13 = 5/13.",["4/11 + 3/11 = ?","7/11"]],"fraction","Sanji"),
+F4:c("Dénominateurs différents","Rendre les fractions comparables avant de calculer.","On ne peut pas additionner directement des tiers et des sixièmes. On fabrique d’abord des fractions avec le même dénominateur.",["1/3 peut-il s’écrire 2/6 ?","oui"],P.fraction,"J’additionne les dénominateurs.",["1/3 + 1/6 = ?","1/2","Regarde 3 et 6 : 6 est un multiple de 3.","1/3 = 2/6.","2/6 + 1/6 = 3/6 = 1/2.",["2/5 + 1/10 = ?","1/2"]],"fraction","Sanji"),
+F5:c("Fractions et nombres relatifs","Gérer correctement les signes dans une addition/soustraction.","Le signe appartient au nombre. Après avoir mis au même dénominateur, on calcule les numérateurs relatifs.",["−4/7 + 1/7 = ?","-3/7"],P.fraction,"Je transforme automatiquement deux signes moins en plus.",["−4/7 + 1/7 = ?","-3/7","Les dénominateurs sont identiques.","−4 + 1 = −3.","−4/7 + 1/7 = −3/7.",["−5/9 + 2/9 = ?","-1/3"]],"fraction","Sanji"),
+F6:c("Entier et fraction","Faire entrer un entier dans un calcul de fractions.","Tout entier peut s’écrire avec 1 au dénominateur : 3 = 3/1. Puis on fabrique le dénominateur utile.",["3 = ?/2","6/2"],P.fraction,"Je laisse l’entier sans le transformer.",["−5/2 − 3 = ?","-11/2","Écris 3 sous forme de demis.","3 = 6/2.","−5/2 − 6/2 = −11/2.",["7/4 − 2 = ?","-1/4"]],"fraction","Sanji"),
+F7:c("Multiplier des fractions","Comprendre une fraction de fraction.","Multiplier des fractions revient à multiplier numérateur par numérateur et dénominateur par dénominateur, puis simplifier.",["2/3 × 3/4 = ?","1/2"],["Je multiplie les numérateurs.","Je multiplie les dénominateurs.","Je simplifie."],"Je cherche un dénominateur commun.",["3/5 × 2/7 = ?","6/35","Multiplie en haut puis en bas.","3 × 2 = 6 ; 5 × 7 = 35.","3/5 × 2/7 = 6/35.",["4/9 × 3/8 = ?","1/6"]],"fraction","Sanji"),
+F8:c("Diviser des fractions","Comprendre « combien de fois ? ».","Diviser par une fraction revient à multiplier par son inverse.",["3/4 ÷ 1/8 = ?","6"],["Je garde la première fraction.","J’inverse la deuxième fraction.","Je remplace ÷ par ×.","Je multiplie et je simplifie."],"J’inverse les deux fractions.",["2/3 ÷ 1/6 = ?","4","Inverse 1/6 : cela devient 6/1.","2/3 × 6 = 12/3.","12/3 = 4.",["5/8 ÷ 3/4 = ?","5/6"]],"fraction","Sanji"),
+F9:c("Calculs multi-étapes","Maintenir la procédure jusqu’au bout.","Un calcul long n’est qu’une suite de petites transformations. On écrit les étapes, on ne fait pas tout mentalement.",["5/6 − 1/3 + 1/2 : un bon dénominateur commun est ?","6"],P.fraction,"Je fais toutes les opérations de tête.",["3/4 + 1/2 − 1/8 = ?","9/8","Prends 8 comme dénominateur commun.","3/4 = 6/8 et 1/2 = 4/8.","6/8 + 4/8 − 1/8 = 9/8.",["5/6 − 1/3 + 1/2 = ?","1"]],"fraction","Sanji"),
+F10:c("Problèmes de fractions","Choisir l’opération à partir d’un contexte.","Je sépare les données, la question, l’opération, le calcul et la phrase-réponse.",["Avant de calculer, faut-il identifier ce que la question demande ?","oui"],["Je relève les données utiles.","Je reformule la question.","Je choisis l’opération.","Je calcule avec la procédure adaptée.","Je réponds par une phrase."],"Je prends tous les nombres et je les additionne.",["Un réservoir est rempli à 1/3 puis encore à 1/6. Quelle part est remplie ?","1/2","La situation demande une addition.","1/3 = 2/6.","2/6 + 1/6 = 3/6 = 1/2.",["On utilise 1/4 puis 1/2 d’une réserve. Quelle part totale ?","3/4"]],"fraction","Sanji"),
+
+C0:c("Comprendre le carré","Ne pas confondre a² et a × 2.","a² signifie a multiplié par lui-même. 7² = 7 × 7.",["7² = ?","49"],P.square,"Pour a², je fais a × 2.",["6² = ?","36","6² signifie 6 × 6.","6 × 6 = 36.","6² = 36.",["8² = ?","64"]],"square","Franky"),
+C1:c("Carrés utiles","Automatiser les carrés utiles du cours.","On vise 1² à 10², puis on ajoute seulement 11² = 121 et 12² = 144 comme automatismes spécifiques.",["12² = ?","144"],P.square,"Je dois apprendre toutes les tables de 11 et 12.",["9² = ?","81","9² = 9 × 9.","9 × 9 = 81.","9² = 81.",["11² = ?","121"]],"square","Franky"),
+C2:c("Comprendre la racine carrée","Faire le chemin inverse du carré.","√49 = 7 car 7² = 49.",["√64 = ?","8"],P.square,"Je divise le nombre par 2.",["√81 = ?","9","Cherche le nombre dont le carré vaut 81.","9² = 81.","√81 = 9.",["√121 = ?","11"]],"square","Franky"),
+C3:c("Aller-retour carré ↔ racine","Automatiser dans les deux sens.","Les couples doivent devenir des réflexes : 8² = 64 et √64 = 8.",["?² = 100","10"],P.square,"Carré et racine sont deux opérations sans lien.",["√144 = ?","12","Quel carré parfait vaut 144 ?","12² = 144.","√144 = 12.",["?² = 49","7"]],"square","Franky"),
+C4:c("Encadrer une racine","Trouver entre quels entiers se situe une racine.","Pour √149 : 12² = 144 et 13² = 169, donc 12 < √149 < 13.",["Quel carré parfait est juste avant 149 ?","144"],["Je cherche le carré parfait juste avant.","Je cherche le carré parfait juste après.","J’encadre le nombre.","Je déduis l’encadrement de la racine."],"Je calcule 149 ÷ 2.",["Entre quels entiers est √149 ?","12 et 13","12² = 144.","13² = 169 et 144 < 149 < 169.","Donc 12 < √149 < 13.",["Entre quels entiers est √110 ?","10 et 11"]],"square","Franky"),
+
+G1:c("Droites perpendiculaires","Reconnaître un angle droit.","Deux droites perpendiculaires se coupent en formant un angle droit.",["Le symbole d’un angle droit est-il un petit carré ?","oui"],P.demo,"Je décide à l’œil sans utiliser le codage.",["Si d1 ⟂ d2, quel angle forment-elles ?","90","Perpendiculaire signifie angle droit.","Un angle droit mesure 90°.","Elles forment un angle de 90°.",["Si AB ⟂ AC, le triangle BAC a-t-il un angle droit en A ?","oui"]],"perp","Nami"),
+G2:c("Droites parallèles","Reconnaître deux droites parallèles.","Deux droites parallèles gardent la même direction et ne se coupent pas.",["Le symbole de parallélisme est-il ∥ ?","oui"],P.demo,"Deux droites parallèles doivent être horizontales.",["Si (AB) ∥ (CD), peuvent-elles se couper ?","non","Relis la définition.","Deux droites parallèles distinctes ne se coupent pas.","Non.",["Le symbole ∥ signifie-t-il parallèle ?","oui"]],"parallel","Nami"),
+G3:c("Perpendiculaires à une même droite","Utiliser une propriété pour conclure au parallélisme.","Si deux droites sont perpendiculaires à une même droite, alors elles sont parallèles.",["AC ⟂ AB et BD ⟂ AB : AC et BD sont-elles parallèles ?","oui"],P.demo,"Je mesure les distances entre les droites.",["AC ⟂ AB et BD ⟂ AB. Conclusion ?","AC//BD","Les deux droites sont perpendiculaires à AB.","Deux droites perpendiculaires à une même droite sont parallèles.","Donc AC ∥ BD.",["d1 ⟂ d3 et d2 ⟂ d3. Conclusion ?","d1//d2"]],"perp","Robin"),
+G4:c("Reconnaître un rectangle","Relier propriétés et nature d’un quadrilatère.","Un rectangle est un quadrilatère qui possède quatre angles droits ; ses côtés opposés sont parallèles.",["Un rectangle a-t-il quatre angles droits ?","oui"],P.demo,"Un quadrilatère avec un angle droit est toujours un rectangle.",["ABCD a quatre angles droits. Nature ?","rectangle","Utilise la définition.","Un quadrilatère à quatre angles droits est un rectangle.","ABCD est un rectangle.",["Un carré est-il aussi un rectangle ?","oui"]],"rect","Robin"),
+G5:c("Lire le codage d’une figure","Extraire toutes les informations visibles.","Avant de calculer, on lit les symboles : angle droit, parallélisme, égalités, longueurs.",["Faut-il utiliser le codage plutôt que la forme dessinée ?","oui"],["Je repère les points.","Je lis les longueurs indiquées.","Je repère les angles droits.","Je repère les parallèles ou égalités codées.","Je note les données utiles."],"Je fais confiance aux proportions du dessin.",["Un petit carré au sommet A indique quoi ?","angle droit","C’est le codage standard.","Le petit carré indique un angle de 90°.","Il indique un angle droit en A.",["Une longueur écrite « 7 cm » est-elle une donnée à relever ?","oui"]],"rect","Nami"),
+G6:c("JE SAIS → OR → DONC","Construire une démonstration courte et correcte.","Une démonstration sépare les informations connues, la propriété mathématique et la conclusion.",["Dans « OR », met-on la propriété ?","oui"],P.demo,"Je mets directement la conclusion sans propriété.",["Que met-on dans « JE SAIS » ?","les données","Ce sont les informations de l’énoncé ou de la figure.","JE SAIS contient les faits connus.","Les données.",["Que met-on dans « DONC » ?","la conclusion"]],"demo","Robin"),
+
+P0:c("Pré-requis Pythagore","Vérifier les fondations avant le théorème.","Avant Pythagore : triangle rectangle, angle droit et hypoténuse doivent être identifiés.",["L’hypoténuse est-elle opposée à l’angle droit ?","oui"],P.pyth,"Je commence par mettre les nombres au carré.",["ABC rectangle en A : l’hypoténuse est ?","BC","Elle est opposée à A.","Le côté opposé à l’angle droit est BC.","BC.",["DEF rectangle en D : hypoténuse ?","EF"]],"triangle","Nami"),
+P1:c("Sens du théorème","Comprendre le lien entre les trois côtés.","Dans un triangle rectangle, l’aire du carré construit sur l’hypoténuse est la somme des aires des carrés sur les deux autres côtés.",["Triangle 3-4-5 : 3² + 4² = ?","25"],P.pyth,"Je calcule seulement le périmètre.",["3² + 4² = ?","25","3² = 9 et 4² = 16.","9 + 16 = 25.","Cela correspond à 5².",["6² + 8² = ?","100"]],"triangle","Robin"),
+P2:c("Identifier l’hypoténuse","Repérer le bon côté avant tout calcul.","L’hypoténuse est toujours le côté opposé à l’angle droit et c’est le plus long côté du triangle rectangle.",["ABC rectangle en A : hypoténuse ?","BC"],P.pyth,"Je choisis le côté le plus vertical.",["MNP rectangle en N : hypoténuse ?","MP","Le côté opposé à N.","MP est en face de l’angle droit.","MP.",["RST rectangle en S : hypoténuse ?","RT"]],"triangle","Nami"),
+P3:c("Écrire l’égalité avec les lettres","Écrire Pythagore avant les nombres.","Si ABC est rectangle en A, alors BC² = AB² + AC².",["ABC rectangle en A : début correct ? BC² = ...","AB²+AC²"],P.pyth,"J’écris directement les nombres.",["DEF rectangle en D : égalité ?","EF²=DE²+DF²","EF est l’hypoténuse.","Le carré de l’hypoténuse est la somme des deux autres carrés.","EF² = DE² + DF².",["MNP rectangle en N : égalité ?","MP²=MN²+NP²"]],"triangle","Robin"),
+P4:c("Chercher l’hypoténuse","Additionner les deux carrés puis prendre la racine.","Quand l’hypoténuse est cherchée, on additionne les carrés des deux autres côtés.",["Côtés 6 et 8 : hypoténuse ?","10"],P.pyth,"Je soustrais les deux carrés.",["ABC rectangle en A, AB=6, AC=8. BC ?","10","BC est l’hypoténuse.","BC² = 36 + 64 = 100.","BC = √100 = 10.",["DE=5, DF=12, triangle DEF rectangle en D. EF ?","13"]],"triangle","Robin"),
+P5:c("Chercher un autre côté","Soustraire un carré à celui de l’hypoténuse.","Quand l’hypoténuse est connue et qu’on cherche un petit côté, on part de l’égalité puis on isole le carré cherché.",["Hypoténuse 13, autre côté 5 : côté manquant ?","12"],P.pyth,"J’additionne toujours les carrés.",["DEF rectangle en D, EF=13, DE=5. DF ?","12","EF est l’hypoténuse.","DF² = 13² − 5² = 169 − 25 = 144.","DF = √144 = 12.",["Hypoténuse 17, côté 8 : autre côté ?","15"]],"triangle","Robin"),
+P6:c("Carré → racine","Ne pas confondre x² et x.","Si AC² = 149, alors AC = √149, pas 149.",["Si x² = 81, x positif vaut ?","9"],P.pyth,"J’écris x = 81.",["AC² = 144. AC ?","12","Prends la racine carrée.","√144 = 12.","AC = 12.",["EG² = 225. EG ?","15"]],"square","Chopper"),
+P7:c("Encadrer / approximer","Réutiliser les carrés parfaits.","Pour √149, on cherche deux carrés parfaits qui encadrent 149.",["144 < 149 < 169 : √149 est entre ?","12 et 13"],P.pyth,"Je compare 149 directement à 12 et 13.",["√149 est entre quels entiers ?","12 et 13","12²=144.","13²=169.","12 < √149 < 13.",["√110 est entre quels entiers ?","10 et 11"]],"square","Franky"),
+P8:c("Problème simple","Traduire une situation en triangle rectangle.","Je cherche d’abord la figure utile et les données, puis j’applique la procédure.",["Une diagonale de rectangle crée-t-elle un triangle rectangle ?","oui"],P.pyth,"Je calcule le périmètre du rectangle.",["Rectangle 9 cm × 12 cm. Diagonale ?","15","La diagonale est l’hypoténuse d’un triangle rectangle.","d² = 9² + 12² = 225.","d = 15 cm.",["Rectangle 6 cm × 8 cm. Diagonale ?","10"]],"rect","Nami"),
+P9:c("Problème riche","Extraire seulement les données utiles.","Dans un problème long, je note : données → question → outil → calcul → phrase-réponse.",["Avant le calcul, faut-il identifier les données utiles ?","oui"],["Je relève la question.","Je liste les données utiles.","Je construis ou repère le triangle rectangle.","Je réactive la procédure Pythagore.","Je calcule.","Je compare ou conclus selon la question."],"J’utilise tous les nombres de l’énoncé dans un seul calcul.",["Corde 10 m, distance au pied 6 m. Hauteur ?","8","La corde est l’hypoténuse.","h² = 10² − 6² = 64.","h = 8 m.",["Échelle 13 m, pied à 5 m du mur. Hauteur ?","12"]],"triangle","Nami"),
+P10:c("Démonstration + Pythagore","Justifier que le théorème s’applique avant de calculer.","Dans certains problèmes, on doit d’abord démontrer que le triangle est rectangle, puis seulement appliquer Pythagore.",["Peut-on invoquer Pythagore sans triangle rectangle ?","non"],P.pyth,"Je cite Pythagore avant d’avoir justifié l’angle droit.",["AB ⟂ BD. Le triangle ABD est-il rectangle en B ?","oui","La perpendicularité crée un angle droit.","AB ⟂ BD, donc l’angle ABD est droit.","ABD est rectangle en B.",["AC ⟂ CD. Le triangle ACD est-il rectangle en C ?","oui"]],"demo","Robin")
+};
+function norm(s){return String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[×·]/g,"*").replace(/[∥]/g,"//").replace(/\s+/g,"").replace(/,/g,".")}
+function getState(){return JSON.parse(localStorage.getItem("jmq_v1")||'{"progress":{},"last":null,"logs":[]}')}
+function putState(s){localStorage.setItem("jmq_v1",JSON.stringify(s));renderHomeSummary()}
+let currentModule=null,currentCode=null,phase=0,attempts=0,picks=[],order=[],run={};
+const phases=["Théorie","Compréhension","Procédure 1","Mémoire","Exercice","Procédure 2","Transfert","Validation"];
+function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");scrollTo(0,0)}
+function goHome(){show("home");renderHome()}
+function moduleProgress(k){const s=getState(),codes=MODULES[k].comps,done=codes.filter(x=>s.progress[x]?.status==="autonome").length;return Math.round(done/codes.length*100)}
+function overall(){let total=Object.keys(C).length,s=getState(),done=Object.values(s.progress).filter(x=>x.status==="autonome").length;return Math.round(done/total*100)}
+function renderHomeSummary(){const el=document.getElementById("homeSummary");if(!el)return;el.innerHTML=`<span class="pill">Progression globale : ${overall()} %</span>`}
+function renderHome(){
+ renderHomeSummary();const host=document.getElementById("moduleCards");
+ host.innerHTML=Object.entries(MODULES).map(([k,m])=>{let p=moduleProgress(k);return `<div class="module-card" onclick="showModule('${k}')"><b>${m.icon} ${m.label}</b><div class="muted small">${m.intro}</div><div class="pct">${p}%</div><div class="bar"><div style="width:${p}%"></div></div><img src="${chars[m.guide]}" alt="${m.guide}" onerror="this.style.display='none'"></div>`}).join("");
+}
+function showModule(k){currentModule=k;const m=MODULES[k];document.getElementById("modulePill").textContent=m.icon+" "+m.guide;document.getElementById("moduleTitle").textContent=m.label;document.getElementById("moduleIntro").textContent=m.intro;renderCompetencies();show("moduleScreen")}
+function backModule(){showModule(currentModule)}
+function renderCompetencies(){const m=MODULES[currentModule],s=getState();document.getElementById("modulePct").innerHTML=`<b>${moduleProgress(currentModule)}%</b> autonome`;
+ document.getElementById("competencyList").innerHTML=m.comps.map(code=>{const d=C[code],st=s.progress[code];let label="Non commencé",cl="";if(st){if(st.status==="autonome"){label="🟢 autonome";cl="green"}else if(st.status==="indice1"){label="🟡 indice 1";cl="yellow"}else if(st.status==="indice2"){label="🟠 indice 2";cl="orange"}else{label="🔴 à revoir";cl="red"}}return `<div class="competency"><div><span class="code">${code}</span><b>${d.title}</b><div class="small muted">${d.obj}</div></div><div><span class="status ${cl}">${label}</span><div style="height:6px"></div><button class="btn sm" onclick="startLesson('${code}')">${st?'Reprendre':'Commencer'}</button></div></div>`}).join("")}
+function startLesson(code){currentCode=code;currentModule=Object.keys(MODULES).find(k=>MODULES[k].comps.includes(code));phase=0;attempts=0;run={maxAid:0,transferAid:0,procedure1:false,procedure2:false,recall:false};renderLesson();show("lessonScreen")}
+function renderLesson(){const d=C[currentCode];document.getElementById("lessonPill").textContent=currentCode+" • "+d.guide;document.getElementById("lessonTitle").textContent=d.title;document.getElementById("lessonObjective").textContent=d.obj;
+ document.getElementById("guideName").textContent=d.guide;document.getElementById("guideImg").src=chars[d.guide]||chars.Chopper;
+ document.getElementById("stepper").innerHTML=phases.map((x,i)=>`<span class="step ${i===phase?'on':i<phase?'done':''}">${i+1}. ${x}</span>`).join("");
+ if(phase===0)theory();else if(phase===1)checkTheory();else if(phase===2)procedure(1);else if(phase===3)recall();else if(phase===4)exercise(false);else if(phase===5)procedure(2);else if(phase===6)exercise(true);else checkpoint();
+}
+function next(){phase++;attempts=0;renderLesson()}
+function visual(type){
+ const d=C[currentCode];let v="";
+ if(type==="fraction")v=`<div class="math"><span class="underline">1</span>/<span class="circle">3</span> + <span class="underline">1</span>/<span class="circle">6</span><div class="small muted">Les dénominateurs sont entourés.</div></div>`;
+ if(type==="table")v=`<div class="math">7 × 8 = <span class="boxit">56</span><div class="small muted">Produit ciblé, sans réciter toute la table.</div></div>`;
+ if(type==="square")v=`<div class="math"><span class="underline">12²</span> = 144<br>√<span class="circle">144</span> = 12</div>`;
+ if(type==="perp")v=`<svg width="300" height="250" viewBox="0 0 300 250"><line x1="35" y1="125" x2="265" y2="125" stroke="#17202a" stroke-width="4"/><line x1="100" y1="35" x2="100" y2="215" stroke="#277a9b" stroke-width="5"/><line x1="210" y1="35" x2="210" y2="215" stroke="#277a9b" stroke-width="5"/><rect x="100" y="105" width="20" height="20" fill="none" stroke="#c94637" stroke-width="4"/><rect x="190" y="105" width="20" height="20" fill="none" stroke="#c94637" stroke-width="4"/><text x="75" y="235">d₁</text><text x="205" y="235">d₂</text><text x="135" y="115">d₃</text></svg>`;
+ if(type==="parallel")v=`<svg width="300" height="230" viewBox="0 0 300 230"><line x1="30" y1="75" x2="270" y2="75" stroke="#277a9b" stroke-width="5"/><line x1="30" y1="160" x2="270" y2="160" stroke="#277a9b" stroke-width="5"/><text x="120" y="62">d₁</text><text x="120" y="187">d₂</text><text x="72" y="125" fill="#c94637" font-weight="900">d₁ ∥ d₂</text></svg>`;
+ if(type==="rect")v=`<svg width="310" height="220" viewBox="0 0 310 220"><rect x="50" y="40" width="210" height="135" fill="#eaf6fa" stroke="#17202a" stroke-width="4"/><rect x="50" y="40" width="22" height="22" fill="none" stroke="#c94637" stroke-width="4"/><line x1="50" y1="175" x2="260" y2="40" stroke="#d5a62a" stroke-width="4"/><text x="32" y="34">A</text><text x="267" y="34">B</text><text x="267" y="194">C</text><text x="32" y="194">D</text></svg>`;
+ if(type==="demo")v=`<div style="width:100%"><div class="note"><b>JE SAIS</b><br>Données / codage</div><div style="font-size:2rem">↓</div><div class="note"><b>OR</b><br>Propriété</div><div style="font-size:2rem">↓</div><div class="note"><b>DONC</b><br>Conclusion</div></div>`;
+ if(type==="triangle")v=`<svg width="320" height="245" viewBox="0 0 320 245"><path d="M55 190 L55 45 L275 190 Z" fill="#eaf6fa" stroke="#17202a" stroke-width="4"/><rect x="55" y="168" width="22" height="22" fill="none" stroke="#c94637" stroke-width="4"/><line x1="55" y1="45" x2="275" y2="190" stroke="#d5a62a" stroke-width="7"/><text x="118" y="112" font-weight="900">hypoténuse</text></svg>`;
+ document.getElementById("visual").innerHTML=v||`<div class="math">${d.title}</div>`;
+}
+function guide(msg,who){const w=who||C[currentCode].guide;document.getElementById("guideName").textContent=w;document.getElementById("guideImg").src=chars[w]||chars.Chopper;document.getElementById("guideText").textContent=msg}
+function theory(){const d=C[currentCode];document.getElementById("stage").innerHTML=`<h3>Je découvre</h3><p>${d.theory}</p><div class="note"><b>Pourquoi une méthode ?</b><br>Parce qu’elle donne un point de départ quand tu bloques et évite de sauter une étape.</div><div class="actions"><button class="btn" onclick="next()">J’ai compris</button></div>`;visual(d.visual);guide("Observe ce que le visuel te demande de regarder avant de calculer.",d.guide)}
+function checkTheory(){const d=C[currentCode],q=d.check;document.getElementById("stage").innerHTML=`<h3>Je vérifie que j’ai compris</h3><p><b>${q[0]}</b></p><input id="theoryAns" class="answer" placeholder="Ta réponse"><div class="actions"><button class="btn" onclick="validateTheory()">Valider</button></div><div id="tfb" class="feedback"></div>`;visual(d.visual);guide("Ici on vérifie le sens du cours, pas encore la vitesse.","Robin")}
+function validateTheory(){const d=C[currentCode],v=norm(document.getElementById("theoryAns").value),ok=v===norm(d.check[1]);const f=document.getElementById("tfb");f.className="feedback show "+(ok?"good":"warn");f.textContent=ok?"Oui. Le cours est compris : on peut construire la procédure.":"Pas encore. Relis la théorie et observe le visuel.";if(ok)setTimeout(next,550)}
+function shuffle(a){return a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1])}
+function procedure(which){const d=C[currentCode];order=shuffle([d.bad,...d.proc]);picks=[];document.getElementById("stage").innerHTML=`<h3>Reconstruction ${which===2?"avant le micro-transfert":"de la procédure"}</h3><p><b>Rituel :</b> sélectionne d’abord l’intrus, puis les vraies étapes dans l’ordre.</p><div id="order" class="order"></div><div class="actions"><button class="btn" onclick="checkOrder(${which})">Valider l’ordre</button></div><div id="ofb" class="feedback"></div>`;document.getElementById("order").innerHTML=order.map((x,i)=>`<div class="order-card" data-i="${i}" onclick="pick(this)"><span class="n">${i+1}</span><span>${x}</span></div>`).join("");visual(d.visual);guide(which===2?"Même méthode, nouveaux nombres : reconstruis-la encore.":"La répétition rend la procédure automatique.","Usopp")}
+function pick(el){const i=+el.dataset.i;el.classList.toggle("sel");picks.includes(i)?picks=picks.filter(x=>x!==i):picks.push(i)}
+function checkOrder(which){const d=C[currentCode],seq=picks.map(i=>order[i]),exp=[d.bad,...d.proc],ok=seq.length===exp.length&&seq.every((x,i)=>x===exp[i]),f=document.getElementById("ofb");f.className="feedback show "+(ok?"good":"warn");f.textContent=ok?"Intrus éliminé et procédure remise dans l’ordre.":"Pas encore : sélectionne l’intrus en premier, puis toutes les étapes dans l’ordre exact.";if(ok){if(which===1)run.procedure1=true;else run.procedure2=true;setTimeout(next,600)}}
+function recall(){document.getElementById("stage").innerHTML=`<h3>Je réécris de mémoire</h3><p>Sans modèle, réécris les étapes essentielles dans l’ordre.</p><textarea id="recall" rows="9" placeholder="1. ...&#10;2. ..."></textarea><div class="actions"><button class="btn" onclick="checkRecall()">Vérifier</button></div><div id="rfb" class="feedback"></div>`;visual(C[currentCode].visual);guide("Ne cherche pas les mots exacts : retrouve le plan d’action.","Robin")}
+function checkRecall(){const text=document.getElementById("recall").value.trim(),need=Math.min(60,C[currentCode].proc.length*18),ok=text.length>=need;const f=document.getElementById("rfb");f.className="feedback show "+(ok?"good":"warn");f.textContent=ok?"Le plan d’action est suffisamment reconstruit. Maintenant, applique-le.":"Écris davantage d’étapes. Le but est de pouvoir redémarrer seul en contrôle.";if(ok){run.recall=true;setTimeout(next,600)}}
+function exercise(transfer){const d=C[currentCode],q=transfer?d.q[5]:d.q;attempts=0;document.getElementById("stage").innerHTML=`<h3>${transfer?"Micro-transfert":"J’applique"}</h3><p><b>${transfer?q[0]:q[0]}</b></p><input id="ans" class="answer" placeholder="Ta réponse"><div class="actions"><button class="btn" onclick="checkAnswer(${transfer})">Valider</button><button class="btn ghost" onclick="phase=0;renderLesson()">Revoir la théorie</button></div><div id="afb" class="feedback"></div>`;visual(d.visual);guide(transfer?"La question change, mais la méthode reste la même.":"Suis les étapes dans l’ordre. Si tu bloques, l’aide arrivera progressivement.",transfer?"Chopper":d.guide)}
+function checkAnswer(transfer){const d=C[currentCode],q=transfer?d.q[5]:d.q;let expected=transfer?q[1]:d.q[1],v=norm(document.getElementById("ans").value),ok=v===norm(expected),f=document.getElementById("afb");if(ok){f.className="feedback show good";f.textContent=transfer?"Micro-transfert réussi. Tu as réutilisé la méthode sur un nouvel exemple.":"Bonne réponse.";if(transfer)run.transferAid=Math.max(run.transferAid,attempts);else run.maxAid=Math.max(run.maxAid,attempts);setTimeout(next,650);return}attempts++;if(transfer)run.transferAid=Math.max(run.transferAid,attempts);else run.maxAid=Math.max(run.maxAid,attempts);
+ const h1=transfer?"Reprends l’étape 1 de ta procédure.":d.q[2],h2=transfer?"Repère précisément ce qui change dans ce nouvel exercice.":d.q[3],exp=transfer?`La bonne réponse était ${expected}. Reviens à la théorie, puis refais cette compétence plus tard.`:d.q[4];
+ if(attempts===1){f.className="feedback show warn";f.innerHTML="<b>Indice 1</b> — "+h1;guide("Je te donne juste un petit déclencheur. À toi de reprendre.","Chopper")}
+ else if(attempts===2){f.className="feedback show warn";f.innerHTML="<b>Indice 2</b> — "+h2;guide("Deuxième aide : je rappelle une partie de la méthode, pas toute la solution.","Chopper")}
+ else {f.className="feedback show bad";f.innerHTML="<b>Troisième erreur — solution expliquée</b><br>"+exp+(transfer?'<div class="actions"><button class="btn ghost" onclick="phase=0;renderLesson()">Revoir la théorie</button><button class="btn blue" onclick="checkpoint()">Terminer cette tentative</button></div>':'<div class="actions"><button class="btn ghost" onclick="phase=0;renderLesson()">Revoir la théorie</button><button class="btn blue" onclick="phase=5;renderLesson()">Reconstruire avant le transfert</button></div>');guide("L’objectif n’est pas de copier la réponse : comprends pourquoi elle fonctionne.","Chopper")}
+}
+function statusFromRun(){const a=Math.max(run.maxAid||0,run.transferAid||0);if((run.transferAid||0)>=3)return["transfert_echoue","🔴🔴 transfert échoué"];if(a===0)return["autonome","🟢 autonome"];if(a===1)return["indice1","🟡 indice 1"];if(a===2)return["indice2","🟠 indice 2"];return["solution","🔴 solution"]}
+function checkpoint(){phase=7;const d=C[currentCode],[status,label]=statusFromRun(),s=getState(),detail={procedure1:run.procedure1,recall:run.recall,maxAid:run.maxAid,procedure2:run.procedure2,transferAid:run.transferAid};s.progress[currentCode]={status,date:new Date().toISOString(),detail};s.last={module:currentModule,code:currentCode};s.logs.push({date:new Date().toISOString(),student:"Jessim",module:MODULES[currentModule].label,code:currentCode,skill:d.title,status,label,detail});putState(s);
+ document.getElementById("stepper").innerHTML=phases.map((x,i)=>`<span class="step ${i===7?'on':i<7?'done':''}">${i+1}. ${x}</span>`).join("");
+ document.getElementById("stage").innerHTML=`<h3>Checkpoint</h3><p><b>${label}</b></p><div class="kpis"><div class="kpi"><b>Procédure</b><br><span class="small">${run.procedure1&&run.procedure2?"réactivée 2 fois":"à renforcer"}</span></div><div class="kpi"><b>Rappel libre</b><br><span class="small">${run.recall?"fait":"incomplet"}</span></div><div class="kpi"><b>Aide exercice</b><br><span class="small">${run.maxAid||0}</span></div><div class="kpi"><b>Aide transfert</b><br><span class="small">${run.transferAid||0}</span></div></div><div class="actions"><button class="btn green" onclick="sendForm()">Valider dans Google Forms</button><button class="btn" onclick="backModule()">Continuer le parcours</button></div><div id="formMsg" class="feedback"></div>`;
+ visual(d.visual);guide(status==="autonome"?"Mission maîtrisée sans aide.":"Cette trace indique précisément le niveau d’aide encore nécessaire.","Luffy")}
+function formConfig(){return JSON.parse(localStorage.getItem("jmq_form")||"{}")}
+function sendForm(){const cfg=formConfig(),f=document.getElementById("formMsg");if(!cfg.base){f.className="feedback show warn";f.innerHTML="Le Google Form maître n’est pas encore configuré. La validation est déjà enregistrée localement et dans le suivi prévu. Ouvre ⚙️ pour renseigner le formulaire.";return}
+ const [status,label]=statusFromRun(),d=C[currentCode],vals={student:"Jessim",module:MODULES[currentModule].label,code:currentCode,status:label,detail:`${d.title} | aide exercice=${run.maxAid||0} | aide transfert=${run.transferAid||0} | rappel=${run.recall?"oui":"non"}`};
+ const u=new URL(cfg.base);const map=[[cfg.student,vals.student],[cfg.module,vals.module],[cfg.code,vals.code],[cfg.status,vals.status],[cfg.detail,vals.detail]];map.forEach(([k,v])=>{if(k)u.searchParams.set(k,v)});window.open(u.toString(),"_blank");f.className="feedback show good";f.textContent="Formulaire prérempli ouvert dans un nouvel onglet."}
+function continueMission(){const s=getState();if(s.last?.module&&s.last?.code){currentModule=s.last.module;startLesson(s.last.code)}else showModule("tables")}
+function openTracking(){window.open(TRACKING_SHEET,"_blank")}
+function toggleSettings(){show("settingsScreen");const c=formConfig();["formBase","entryStudent","entryModule","entryCode","entryStatus","entryDetail"].forEach(id=>document.getElementById(id).value=c[id.replace("formBase","base").replace("entryStudent","student").replace("entryModule","module").replace("entryCode","code").replace("entryStatus","status").replace("entryDetail","detail")]||"")}
+function saveFormConfig(){const c={base:formBase.value.trim(),student:entryStudent.value.trim(),module:entryModule.value.trim(),code:entryCode.value.trim(),status:entryStatus.value.trim(),detail:entryDetail.value.trim()};localStorage.setItem("jmq_form",JSON.stringify(c));alert("Configuration Google Forms enregistrée sur cet appareil.");goHome()}
+function exportProgress(){const blob=new Blob([JSON.stringify(getState(),null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="jessim-math-quest-progression.json";a.click();URL.revokeObjectURL(a.href)}
+renderHome();
+initAccess();
+</script>
+
+<footer class="creator-footer">
+  Akim Zeboudj / AZ Consulting - Pédagogie
+<span class="creator-contact"><a href="mailto:zeboudjakim@gmail.com" style="color:inherit;text-decoration:none">zeboudjakim@gmail.com</a></span>
+</footer>
+
+</body>
+</html>

@@ -31,3 +31,11 @@ le code d'accès : `NAKAMA-78-2026`.
 Étape GitHub requise après création du dépôt :
 Settings → Pages → Source → GitHub Actions.
 
+
+## État de publication — 28 octobre 2026
+Dépôt privé créé sur AZDEZED/jessim-math-quest.
+GitHub Pages est bloqué par l'offre actuelle du compte : GitHub demande une mise à niveau
+ou un dépôt public. Le dépôt reste privé conformément à la consigne.
+Après résolution de cette condition, sélectionner GitHub Actions comme source Pages
+et lancer « Déployer Jessim Math Quest ».
+L'artefact publié ne contient que index.html, .nojekyll et assets/ ; le README et les workflows sont exclus.
