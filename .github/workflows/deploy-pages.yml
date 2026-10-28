@@ -1,12 +1,7 @@
 name: Déployer Jessim Math Quest
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Installer les visuels One Piece"]
-    types: [completed]
 
 permissions:
   contents: read
